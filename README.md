@@ -95,7 +95,7 @@ Código o consulta que produjo las filas: celda «Anexo A» del cuaderno `00_pru
 
 | Archivo (nombre exacto) | URL o DOI del productor primario | Fecha de descarga | Huella SHA-256 |
 | --- | --- | --- | --- |
-| `c5yvn32dzg-2.zip` | https://doi.org/10.17632/c5yvn32dzg.2 | _(AAAA-MM-DD)_ | _(…)_ |
+| _(nombre exacto que imprime el cuaderno)_ | https://doi.org/10.17632/c5yvn32dzg.2 | _(AAAA-MM-DD)_ | _(…)_ |
 | `nasa_power_ciidea_mensual.csv` | https://power.larc.nasa.gov/api/temporal/monthly/point | _(AAAA-MM-DD)_ | _(…)_ |
 
 2. **Descarga trazable:** el cuaderno descarga RoCoLe desde el enlace de Mendeley Data asociado al DOI y el clima desde la API de NASA POWER. La búsqueda `grep -inE "kaggle|kagglehub|/kaggle/input" *.ipynb` se ejecuta sobre el cuaderno entregado y no debe devolver coincidencias.

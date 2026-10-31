@@ -14,7 +14,7 @@ import pandas as pd
 import requests
 
 DATA_DIR = "datos"
-URL_ROCOLE = "https://prod-dcd-datasets-cache-zipfiles.s3.eu-west-1.amazonaws.com/c5yvn32dzg-2.zip"
+URL_API = "https://data.mendeley.com/public-api/datasets/c5yvn32dzg/files"
 URL_POWER = "https://power.larc.nasa.gov/api/temporal/monthly/point"
 LAT, LON = -0.834206, -80.177159
 
@@ -28,15 +28,32 @@ def sha256(ruta):
 
 
 def descargar_rocole():
-    destino = os.path.join(DATA_DIR, "c5yvn32dzg-2.zip")
-    if not os.path.exists(destino):
-        r = requests.get(URL_ROCOLE, timeout=300)
-        r.raise_for_status()
-        with open(destino, "wb") as f:
-            f.write(r.content)
-    with zipfile.ZipFile(destino) as z:
-        z.extractall(os.path.join(DATA_DIR, "rocole"))
-    print("RoCoLe:", destino, "SHA-256:", sha256(destino))
+    """Descarga los archivos del DOI con la API pública de Mendeley Data.
+
+    Si la API falla, descarga el .zip a mano con «Download All» en
+    https://data.mendeley.com/datasets/c5yvn32dzg/2 y guárdalo en datos/.
+    """
+    destino_dir = os.path.join(DATA_DIR, "rocole")
+    os.makedirs(destino_dir, exist_ok=True)
+    zips = [f for f in os.listdir(DATA_DIR) if f.endswith(".zip")]
+    if zips:
+        for nombre in zips:
+            ruta = os.path.join(DATA_DIR, nombre)
+            with zipfile.ZipFile(ruta) as z:
+                z.extractall(destino_dir)
+            print("RoCoLe:", ruta, "SHA-256:", sha256(ruta))
+        return
+    r = requests.get(URL_API, params={"folder_id": "root", "version": 2}, timeout=120)
+    r.raise_for_status()
+    for a in r.json():
+        destino = os.path.join(destino_dir, a["filename"])
+        if not os.path.exists(destino):
+            with requests.get(a["content_details"]["download_url"], stream=True, timeout=600) as d:
+                d.raise_for_status()
+                with open(destino, "wb") as f:
+                    for bloque in d.iter_content(1 << 20):
+                        f.write(bloque)
+        print("RoCoLe:", destino, "SHA-256:", sha256(destino))
 
 
 def descargar_power(inicio=2018, fin=2019):
