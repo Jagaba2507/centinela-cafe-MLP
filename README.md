@@ -9,7 +9,7 @@ Una página de texto (secciones 0 a 8) más tres anexos que no cuentan en la ext
 | Título del proyecto | Centinela del Café: alerta temprana de roya en hojas de café robusta |
 | Integrantes | |
 | Fecha | 2026-10-31 |
-| Versión | v1 en la Fase 1 |
+| Versión | v1 en la Fase 1 | 
 
 ## 1. Problema, cliente y objetivo binario
 
