@@ -42,7 +42,7 @@ Hay trabajos públicos que clasifican RoCoLe con redes convolucionales, pero nin
 - **Paso a la Fase 2:** una CNN procesa la imagen completa y una LSTM o GRU procesa la serie diaria de NASA POWER de los días previos a cada toma; ambas ramas se fusionan para emitir la alerta.
 - **Clave de alineación (se marca una):**
   - [ ] Agregada, p. ej., (región, mes), con su salvedad de fuga de datos y de rasgo casi constante: no se usa, porque las fotografías traen la fecha de toma.
-  - [x] Por muestra, p. ej., (finca, semana): llave concreta (entidad + ventana) y fuente fechada y georreferenciada que la habilita: (sitio, día de toma) = (CIIDEA–ESPAM MFL, Calceta, Manabí, Ecuador; lat −0,8342, lon −80,1772; fecha EXIF de cada fotografía). El sitio lo publican los autores y la fecha sale del metadato EXIF de las 1.560 imágenes (del 2019-04-09 al 2019-05-02). Cada imagen se une con el clima diario de NASA POWER de ese día y con la humedad relativa media de los 14 días previos, calculada sin mirar el futuro. Salvedad: todas las imágenes vienen de un solo sitio y de un periodo de 24 días, así que la variabilidad climática es baja y se reporta como límite de la fusión en la Fase 2. Para evitar fuga, la partición se agrupa por planta (390 plantas, cuatro imágenes por planta, identificadas por el prefijo `C{n}P{m}` del nombre de archivo).
+  - [x] Por muestra, p. ej., (finca, semana): llave concreta (entidad + ventana) y fuente fechada y georreferenciada que la habilita: (sitio, día de toma) = (CIIDEA–ESPAM MFL, Calceta, Manabí, Ecuador; lat −0,8342, lon −80,1772; fecha EXIF de cada fotografía). El sitio lo publican los autores y la fecha sale del metadato EXIF de las 1.560 imágenes (del 2019-04-09 al 2019-05-02). Cada imagen se une con el clima diario de NASA POWER de ese día y con la humedad relativa media de los 14 días previos, calculada sin mirar el futuro. Salvedad: todas las imágenes vienen de un solo sitio y de un periodo de 24 días, así que la variabilidad climática es baja y se reporta como límite de la fusión en la Fase 2. Para evitar fuga, la partición se agrupa por planta (390 plantas verificadas en `RoCoLe-classes.xlsx`, cada una con cuatro imágenes —dos del haz (H) y dos del envés (E)— identificadas por el prefijo `C{n}P{m}` del nombre de archivo).
 - **Prueba de acoplamiento (obligatoria):** diez filas reales en el anexo A.
 - **Si la modalidad aplanada es una serie temporal:** no aplica; la modalidad aplanada es la imagen.
 
@@ -76,16 +76,18 @@ Clave: (sitio, día de toma) = (CIIDEA–ESPAM MFL, fecha EXIF de la fotografía
 
 | N.º | Clave | Dato de la rama de imagen (archivo o rasgo) | Dato de la serie (variable y valor) |
 | --- | --- | --- | --- |
-| 1 | | | |
-| 2 | | | |
-| 3 | | | |
-| 4 | | | |
-| 5 | | | |
-| 6 | | | |
-| 7 | | | |
-| 8 | | | |
-| 9 | | | |
-| 10 | | | |
+| 1 | (CIIDEA-ESPAM MFL, 2019-04-10) | `C10P7E2.jpg` (rust_level_2) · RGB medio = (110.9, 131.3, 97.0) | T2M = 25.83 °C · RH2M = 81.17 % · PRECTOTCORR = 0.52 mm/día · RH2M 14 d previos = 86.63 % |
+| 2 | (CIIDEA-ESPAM MFL, 2019-04-10) | `C7P19E2.jpg` (healthy) · RGB medio = (106.7, 117.1, 85.2) | T2M = 25.83 °C · RH2M = 81.17 % · PRECTOTCORR = 0.52 mm/día · RH2M 14 d previos = 86.63 % |
+| 3 | (CIIDEA-ESPAM MFL, 2019-04-10) | `C10P8H1.jpg` (healthy) · RGB medio = (86.1, 118.5, 72.4) | T2M = 25.83 °C · RH2M = 81.17 % · PRECTOTCORR = 0.52 mm/día · RH2M 14 d previos = 86.63 % |
+| 4 | (CIIDEA-ESPAM MFL, 2019-05-01) | `C5P39E1.jpg` (healthy) · RGB medio = (103.7, 116.8, 79.2) | T2M = 26.35 °C · RH2M = 85.81 % · PRECTOTCORR = 15.64 mm/día · RH2M 14 d previos = 86.63 % |
+| 5 | (CIIDEA-ESPAM MFL, 2019-04-11) | `C3P19H1.jpg` (healthy) · RGB medio = (83.1, 107.0, 42.0) | T2M = 25.59 °C · RH2M = 82.17 % · PRECTOTCORR = 0.08 mm/día · RH2M 14 d previos = 86.22 % |
+| 6 | (CIIDEA-ESPAM MFL, 2019-04-11) | `C3P15E2.jpg` (rust_level_2) · RGB medio = (101.0, 120.0, 36.5) | T2M = 25.59 °C · RH2M = 82.17 % · PRECTOTCORR = 0.08 mm/día · RH2M 14 d previos = 86.22 % |
+| 7 | (CIIDEA-ESPAM MFL, 2019-04-10) | `C6P22H1.jpg` (healthy) · RGB medio = (91.5, 117.4, 62.3) | T2M = 25.83 °C · RH2M = 81.17 % · PRECTOTCORR = 0.52 mm/día · RH2M 14 d previos = 86.63 % |
+| 8 | (CIIDEA-ESPAM MFL, 2019-04-11) | `C11P10H1.jpg` (healthy) · RGB medio = (93.1, 135.0, 62.5) | T2M = 25.59 °C · RH2M = 82.17 % · PRECTOTCORR = 0.08 mm/día · RH2M 14 d previos = 86.22 % |
+| 9 | (CIIDEA-ESPAM MFL, 2019-04-11) | `C12P21H1.jpg` (healthy) · RGB medio = (85.5, 147.7, 77.1) | T2M = 25.59 °C · RH2M = 82.17 % · PRECTOTCORR = 0.08 mm/día · RH2M 14 d previos = 86.22 % |
+| 10 | (CIIDEA-ESPAM MFL, 2019-04-11) | `C8P17H2.jpg` (rust_level_1) · RGB medio = (111.7, 138.2, 77.1) | T2M = 25.59 °C · RH2M = 82.17 % · PRECTOTCORR = 0.08 mm/día · RH2M 14 d previos = 86.22 % |
+
+Las diez imágenes se eligieron al azar con semilla 42. El valor de RH2M de los 14 días previos coincide en las filas del 2019-04-10 y del 2019-05-01 (86,63 %); se verificó contra `nasa_power_ciidea_diario.csv` y es una coincidencia de los datos.
 
 Código o consulta que produjo las filas: secciones 4b y 5 del cuaderno `00_prueba_acoplamiento.ipynb`, con la consulta a la API diaria de NASA POWER (`/api/temporal/daily/point`, parámetros T2M, RH2M y PRECTOTCORR, comunidad AG).
 
@@ -98,7 +100,7 @@ Código o consulta que produjo las filas: secciones 4b y 5 del cuaderno `00_prue
 | `RoCoLe.zip` | https://doi.org/10.17632/c5yvn32dzg.2 | 2026-10-31 | `31daa765fb0cc27d4b9b897fa6350aacf0087ee5771d3c7599d2ac7041b866ff` |
 | `RoCoLe-classes.xlsx` | https://doi.org/10.17632/c5yvn32dzg.2 | 2026-10-31 | `0040a57ffd441bd69ead997309d14c8d7f6fdfc83c5dbdc47805e0bc4da05ef2` |
 | `nasa_power_ciidea_mensual.csv` | https://power.larc.nasa.gov/api/temporal/monthly/point | 2026-10-31 | `75982bc2473818310e75bd265a0f0a08c710a724d7d16f9f873221282710cdfc` |
-| `nasa_power_ciidea_diario.csv` | https://power.larc.nasa.gov/api/temporal/daily/point | _(AAAA-MM-DD)_ | _(lo imprime la sección 4b del cuaderno)_ |
+| `nasa_power_ciidea_diario.csv` | https://power.larc.nasa.gov/api/temporal/daily/point | 2026-10-31 | `eabc2fd50a5a85a05cf6996402381fc2b64ad300771b4c55c09d99e4e6afdfbe` |
 
 2. **Descarga trazable:** RoCoLe se descargó desde la página del DOI en Mendeley Data (`RoCoLe.zip`, 2.245,6 MB) y el clima desde la API de NASA POWER; el cuaderno verifica las huellas. La búsqueda `grep -inE "kaggle|kagglehub|/kaggle/input" *.ipynb` se ejecuta sobre el cuaderno entregado y no debe devolver coincidencias.
 3. **Búsqueda declarada de espejos** (fecha 2026-10-31): sin coincidencias en kaggle.com para «RoCoLe». Copias fuera de Kaggle identificadas y no usadas: https://universe.roboflow.com/coffee-leaf-detection/rocole-xot5m y https://datasetninja.com/rocole.
