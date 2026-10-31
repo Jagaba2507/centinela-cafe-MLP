@@ -7,9 +7,9 @@ Una página de texto (secciones 0 a 8) más tres anexos que no cuentan en la ext
 | Campo | Detalle |
 | --- | --- |
 | Título del proyecto | Centinela del Café: alerta temprana de roya en hojas de café robusta |
-| Integrantes | Jaime Andres Garcia Barros, Adrian Felipe Grateron Ramirez, Jhonatan Smith Doncel Murillo |
+| Integrantes | Jaime Andres Garcia Barros, Adrian Felipe Grateron Ramirez, Jhonatan Smith Doncel Murillo|
 | Fecha | 2026-10-31 |
-| Versión | v1 en la Fase 1 | 
+| Versión | v1 en la Fase 1 |                                                     
 
 ## 1. Problema, cliente y objetivo binario
 
@@ -32,17 +32,17 @@ Una página de texto (secciones 0 a 8) más tres anexos que no cuentan en la ext
 
 ## 4. Por qué NO es un reto resuelto
 
-El dato es crudo: RoCoLe entrega fotografías de campo con fondo e iluminación variables, clases desbalanceadas y una etiqueta ordinal, sin partición ni rasgos tabulares. Tampoco trae fecha ni ubicación por imagen, así que el cruce con el clima debe construirse y declararse. La búsqueda de espejos del 2026-10-31 no encontró una réplica en kaggle.com; sí existen copias fuera de Kaggle (Roboflow Universe, Dataset Ninja), que no se usan, porque la descarga se hace desde el DOI de Mendeley.
+El dato es crudo: RoCoLe entrega fotografías de campo con fondo e iluminación variables, clases desbalanceadas y una etiqueta ordinal, sin partición ni rasgos tabulares. El artículo no publica las fechas de toma, pero las 1.560 fotografías las conservan en sus metadatos EXIF (del 2019-04-09 al 2019-05-02), así que el cruce con el clima debe construirse desde ese metadato. La búsqueda de espejos del 2026-10-31 no encontró una réplica en kaggle.com; sí existen copias fuera de Kaggle (Roboflow Universe, Dataset Ninja), que no se usan, porque la descarga se hace desde el DOI de Mendeley.
 
 Hay trabajos públicos que clasifican RoCoLe con redes convolucionales, pero ninguno resuelve el problema de esta propuesta. Aquí el reto es elegir un umbral según el costo de cada error para el pequeño productor. En la Fase 2, además, se fusiona la hoja con el clima previo. Las evidencias están en el anexo B.
 
 ## 5. Plan de la Fase 1, clave de alineación y prueba de acoplamiento
 
 - **Modalidad que se modela en la Fase 1 (aplanada a tabla):** la imagen, resumida por hoja en rasgos de color: media y desviación de los canales R, G y B y de H, S y V, más la proporción de píxeles en el rango amarillo-naranja de las pústulas.
-- **Paso a la Fase 2:** una CNN procesa la imagen completa y una LSTM o GRU procesa la serie diaria de NASA POWER; ambas ramas se fusionan para emitir la alerta.
+- **Paso a la Fase 2:** una CNN procesa la imagen completa y una LSTM o GRU procesa la serie diaria de NASA POWER de los días previos a cada toma; ambas ramas se fusionan para emitir la alerta.
 - **Clave de alineación (se marca una):**
-  - [x] Agregada, p. ej., (región, mes), con su salvedad de fuga de datos y de rasgo casi constante: (sitio, ventana de colecta) = (CIIDEA–ESPAM MFL, Calceta, Manabí, Ecuador; lat −0,8342, lon −80,1772; 2018-05 a 2019-04). Los autores no publican la fecha de cada imagen; la ventana se asume como los doce meses previos a la publicación del conjunto (2019-05-17) y se contrasta con los metadatos EXIF de las fotografías. Salvedad: todas las imágenes heredan el mismo vector climático. En la Fase 1 ese vector no discrimina entre clases, y en la Fase 2 limita lo que la fusión puede aprender. Para evitar fuga, la partición se agrupa por planta (cuatro imágenes por planta), de modo que una misma planta no quede en entrenamiento y en prueba.
-  - [ ] Por muestra, p. ej., (finca, semana): llave concreta (entidad + ventana) y fuente fechada y georreferenciada que la habilita: solo se activa si los metadatos EXIF traen la fecha de toma; en ese caso, la clave pasa a ser (sitio, semana).
+  - [ ] Agregada, p. ej., (región, mes), con su salvedad de fuga de datos y de rasgo casi constante: no se usa, porque las fotografías traen la fecha de toma.
+  - [x] Por muestra, p. ej., (finca, semana): llave concreta (entidad + ventana) y fuente fechada y georreferenciada que la habilita: (sitio, día de toma) = (CIIDEA–ESPAM MFL, Calceta, Manabí, Ecuador; lat −0,8342, lon −80,1772; fecha EXIF de cada fotografía). El sitio lo publican los autores y la fecha sale del metadato EXIF de las 1.560 imágenes (del 2019-04-09 al 2019-05-02). Cada imagen se une con el clima diario de NASA POWER de ese día y con la humedad relativa media de los 14 días previos, calculada sin mirar el futuro. Salvedad: todas las imágenes vienen de un solo sitio y de un periodo de 24 días, así que la variabilidad climática es baja y se reporta como límite de la fusión en la Fase 2. Para evitar fuga, la partición se agrupa por planta (390 plantas, cuatro imágenes por planta, identificadas por el prefijo `C{n}P{m}` del nombre de archivo).
 - **Prueba de acoplamiento (obligatoria):** diez filas reales en el anexo A.
 - **Si la modalidad aplanada es una serie temporal:** no aplica; la modalidad aplanada es la imagen.
 
@@ -72,7 +72,7 @@ El checklist de protección de datos va en el anexo C, uno por fuente.
 
 ## Anexo A · Prueba de acoplamiento
 
-Clave: (CIIDEA–ESPAM MFL, 2018-05 a 2019-04)
+Clave: (sitio, día de toma) = (CIIDEA–ESPAM MFL, fecha EXIF de la fotografía)
 
 | N.º | Clave | Dato de la rama de imagen (archivo o rasgo) | Dato de la serie (variable y valor) |
 | --- | --- | --- | --- |
@@ -87,7 +87,7 @@ Clave: (CIIDEA–ESPAM MFL, 2018-05 a 2019-04)
 | 9 | | | |
 | 10 | | | |
 
-Código o consulta que produjo las filas: celda «Anexo A» del cuaderno `00_prueba_acoplamiento.ipynb`, con la consulta a la API mensual de NASA POWER (`/api/temporal/monthly/point`, parámetros T2M, RH2M y PRECTOTCORR, comunidad AG).
+Código o consulta que produjo las filas: secciones 4b y 5 del cuaderno `00_prueba_acoplamiento.ipynb`, con la consulta a la API diaria de NASA POWER (`/api/temporal/daily/point`, parámetros T2M, RH2M y PRECTOTCORR, comunidad AG).
 
 ## Anexo B · Evidencias del test de procedencia
 
@@ -95,12 +95,14 @@ Código o consulta que produjo las filas: celda «Anexo A» del cuaderno `00_pru
 
 | Archivo (nombre exacto) | URL o DOI del productor primario | Fecha de descarga | Huella SHA-256 |
 | --- | --- | --- | --- |
-| _(nombre exacto que imprime el cuaderno)_ | https://doi.org/10.17632/c5yvn32dzg.2 | _(AAAA-MM-DD)_ | _(…)_ |
-| `nasa_power_ciidea_mensual.csv` | https://power.larc.nasa.gov/api/temporal/monthly/point | _(AAAA-MM-DD)_ | _(…)_ |
+| `RoCoLe.zip` | https://doi.org/10.17632/c5yvn32dzg.2 | 2026-10-31 | `31daa765fb0cc27d4b9b897fa6350aacf0087ee5771d3c7599d2ac7041b866ff` |
+| `RoCoLe-classes.xlsx` | https://doi.org/10.17632/c5yvn32dzg.2 | 2026-10-31 | `0040a57ffd441bd69ead997309d14c8d7f6fdfc83c5dbdc47805e0bc4da05ef2` |
+| `nasa_power_ciidea_mensual.csv` | https://power.larc.nasa.gov/api/temporal/monthly/point | 2026-10-31 | `75982bc2473818310e75bd265a0f0a08c710a724d7d16f9f873221282710cdfc` |
+| `nasa_power_ciidea_diario.csv` | https://power.larc.nasa.gov/api/temporal/daily/point | _(AAAA-MM-DD)_ | _(lo imprime la sección 4b del cuaderno)_ |
 
-2. **Descarga trazable:** el cuaderno descarga RoCoLe desde el enlace de Mendeley Data asociado al DOI y el clima desde la API de NASA POWER. La búsqueda `grep -inE "kaggle|kagglehub|/kaggle/input" *.ipynb` se ejecuta sobre el cuaderno entregado y no debe devolver coincidencias.
+2. **Descarga trazable:** RoCoLe se descargó desde la página del DOI en Mendeley Data (`RoCoLe.zip`, 2.245,6 MB) y el clima desde la API de NASA POWER; el cuaderno verifica las huellas. La búsqueda `grep -inE "kaggle|kagglehub|/kaggle/input" *.ipynb` se ejecuta sobre el cuaderno entregado y no debe devolver coincidencias.
 3. **Búsqueda declarada de espejos** (fecha 2026-10-31): sin coincidencias en kaggle.com para «RoCoLe». Copias fuera de Kaggle identificadas y no usadas: https://universe.roboflow.com/coffee-leaf-detection/rocole-xot5m y https://datasetninja.com/rocole.
-4. **Huella de crudeza** (antes de limpiar): filas × columnas _(…)_ · faltantes _(… %)_ · balance de la etiqueta: 791 sanas, 344 roya nivel 1, 166 nivel 2, 62 nivel 3, 30 nivel 4 y 167 ácaro rojo (conteos publicados por los autores; el cuaderno los confirma).
+4. **Huella de crudeza** (antes de limpiar): `RoCoLe-classes.xlsx`, 1.560 × 3, 0 % de faltantes. Las exportaciones originales de Labelbox tienen más faltantes: `RoCoLE-csv.csv`, 1.560 × 18, 22,17 %; `RoCoLE-json.json`, 1.560 × 19, 21,0 %. Balance de la etiqueta: 791 sanas, 344 roya nivel 1, 166 nivel 2, 62 nivel 3, 30 nivel 4 y 167 ácaro rojo, verificado en el cuaderno. Las 1.560 imágenes traen fecha EXIF y ninguna trae GPS.
 5. **Contraste con el espejo** (si existe): no aplica, porque no se encontró una réplica en Kaggle.
 
 ## Anexo C · Checklist de protección de datos personales (uno por fuente)
@@ -117,8 +119,8 @@ Regla de la Fase 1: sin personas identificables. Solo se usan datos públicos, a
 
 ### A. ¿Hay datos personales? (Ley, art. 3 lit. c)
 
-- [x] Se revisaron todas las columnas, imágenes y metadatos en busca de identificadores directos (nombre, documento, correo, teléfono, dirección, número de cuenta, contrato, NIU, matrícula, placa, rostro, voz). → Las imágenes muestran solo hojas; no hay rostros ni identificadores.
-- [x] Se revisaron los identificadores indirectos, que combinados permiten señalar a alguien: coordenadas exactas, fecha + municipio pequeño, edad + sexo + institución, metadatos EXIF/GPS de fotos. → El único dato de ubicación es el de un centro de investigación público; el EXIF/GPS se revisa en el cuaderno.
+- [x] Se revisaron todas las columnas, imágenes y metadatos en busca de identificadores directos (nombre, documento, correo, teléfono, dirección, número de cuenta, contrato, NIU, matrícula, placa, rostro, voz). → Las imágenes muestran solo hojas, sin rostros. Las exportaciones de Labelbox (`RoCoLE-csv.csv`, `RoCoLE-json.json`) incluyen el correo del anotador en la columna «Created By»; esos archivos no se usan, y el proyecto trabaja solo con `RoCoLe-classes.xlsx` (columnas File, Binary.Label y Multiclass.Label).
+- [x] Se revisaron los identificadores indirectos, que combinados permiten señalar a alguien: coordenadas exactas, fecha + municipio pequeño, edad + sexo + institución, metadatos EXIF/GPS de fotos. → Se revisó el EXIF de las 1.560 imágenes: todas traen fecha de toma y ninguna trae GPS. El único dato de ubicación es el de un centro de investigación público.
 - [x] Un identificador seudonimizado (p. ej., un NIU o un documento cifrado) se trata como dato personal: sigue siendo «asociable» a la persona. → No hay identificadores de personas.
 
 ### B. ¿Hay datos sensibles? (Ley, art. 5)
@@ -143,7 +145,7 @@ Regla de la Fase 1: sin personas identificables. Solo se usan datos públicos, a
 ### F. Anonimización y riesgo de reidentificación
 
 - [ ] Se eliminaron los identificadores directos y se generalizaron los indirectos (p. ej., coordenadas → vereda o municipio; fecha → semana o mes; edad → rangos). → No aplica: no hay identificadores de personas.
-- [ ] Se borraron los metadatos EXIF/GPS de las imágenes. → Pendiente: el cuaderno borra el EXIF/GPS antes de subir imágenes a Drive o GitHub.
+- [ ] Se borraron los metadatos EXIF/GPS de las imágenes. → No se borran: ninguna de las 1.560 imágenes trae GPS, y la fecha EXIF se conserva porque es la clave de alineación y no identifica a ninguna persona. Las imágenes no se suben a GitHub.
 - [x] Prueba de reidentificación respondida por escrito: «¿podría alguien identificar a una persona combinando estas columnas con información pública?». Las celdas con conteos muy pequeños (p. ej., 1 caso por municipio y semana) no se publican sin agregar. → No: la ubicación corresponde a un centro de investigación, no a una persona.
 
 ### G. Licencia de uso (de cada fuente, verificada en la fuente primaria)
@@ -160,7 +162,7 @@ Regla de la Fase 1: sin personas identificables. Solo se usan datos públicos, a
 
 ### I. Minimización y conservación
 
-- [x] Solo se descargan y conservan las columnas necesarias para el problema (DUR 2.2.2.25.2.1). → Imágenes y etiquetas necesarias para el problema.
+- [x] Solo se descargan y conservan las columnas necesarias para el problema (DUR 2.2.2.25.2.1). → Imágenes y `RoCoLe-classes.xlsx`; no se usan las columnas de Labelbox con datos del anotador.
 - [x] Se declara dónde se guardan los datos crudos y que se borran al terminar el curso o la Fase 3 (DUR 2.2.2.25.2.8), con medidas de seguridad razonables (Ley, art. 4 lit. g). → Los datos crudos se guardan en Drive y se borran al terminar la Fase 3.
 
 ### J. Publicación del repositorio (Ley, art. 4 lit. f)
