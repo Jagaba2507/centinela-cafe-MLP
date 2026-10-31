@@ -1,0 +1,9 @@
+numpy
+pandas
+requests
+Pillow
+tabulate
+torch
+scikit-learn
+matplotlib
+openpyxl

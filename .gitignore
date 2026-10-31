@@ -1,0 +1,7 @@
+datos/
+*.zip
+__pycache__/
+.ipynb_checkpoints/
+# Notas de trabajo locales
+00_Guia_Centinela_Fase1.md
+correo_profesor.txt
